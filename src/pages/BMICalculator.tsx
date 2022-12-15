@@ -16,9 +16,9 @@ import {
 } from "@ionic/react";
 import { calculatorOutline, refreshCircleOutline } from "ionicons/icons";
 import { useRef, useState } from "react";
-import "./Tab1.css";
+import "./BMICalculator.module.css";
 
-const Tab1: React.FC = () => {
+const BMICalculator: React.FC = () => {
   const heightInputRef = useRef<HTMLIonInputElement>(null);
   const weightInputRef = useRef<HTMLIonInputElement>(null);
   const [bmiResult,setBmiResult] = useState<number>(0);
@@ -30,13 +30,14 @@ const Tab1: React.FC = () => {
     if( !enteredWeight || !enteredHeight) {
       presentAlert({
         header: 'Alert',
-        message: 'Please fill all fields to calculate bmi',
+        message: 'Please fill all fields to calculate the BMI',
         buttons: ['OK']
       })
       return
     }
-    const bmi = +enteredWeight*1.0 / (+enteredHeight * +enteredHeight);
-    setBmiResult(bmi);
+    const bmi = +enteredWeight*1.0*10000 / (+enteredHeight * +enteredHeight);
+    const bmiFixed = Number.parseFloat(bmi.toFixed(2))
+    setBmiResult(bmiFixed);
   }
   const handleReset = () => {
     weightInputRef.current!.value="";
@@ -49,32 +50,45 @@ const Tab1: React.FC = () => {
 
   const bmiToText = (bmi: number) => {
     let text="";
+    let bmiRange="";
     switch(true) {
       case (bmi <18.5): 
+        // Gầy
         text="Thin"
+        bmiRange="<18.5"
         break; 
       case (bmi >= 18.5 && bmi <24.9):
+        // Vừa
         text="Fit"
+        bmiRange="18.5 - 24.9"
         break;
       case (bmi >=24.9 && bmi < 29.9):
+        // Tiền béo phì
         text="Pre obesity"
+        bmiRange="24.9 - 29.9"
         break;
       case (bmi >=29.9 && bmi < 34.9):
+        // Béo phì cấp I
         text="Obesity level I"
+        bmiRange="29.9 - 34.9"
         break;
       case (bmi >=34.9 && bmi < 39.9):
+        // Béo phì cấp II
         text="Obesity level II"
+        bmiRange="34.9 - 39.9"
         break;
       default: 
+        // Béo phì cấp III
         text="Obesity level III"
+        bmiRange="> 39.9"
     }
-    return text;
+    return {text,bmiRange};
   }
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>BMI Calculator</IonTitle>
+          <IonTitle>BMI(Body Mass Index) Calculator</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
@@ -84,6 +98,7 @@ const Tab1: React.FC = () => {
               <IonItem>
                 <IonLabel position="floating">Your weight</IonLabel>
                 <IonInput
+                  name="weight"
                   type="number"
                   placeholder="Enter your weight (kg)"
                   ref={weightInputRef}
@@ -95,8 +110,9 @@ const Tab1: React.FC = () => {
               <IonItem>
                 <IonLabel position="floating">Your height</IonLabel>
                 <IonInput
+                  name="height"
                   type="number"
-                  placeholder="Enter your height (m)"
+                  placeholder="Enter your height (cm)"
                   ref={heightInputRef}
                   onChange={() => handleChange(heightInputRef.current?.value)}
                 ></IonInput>
@@ -106,7 +122,10 @@ const Tab1: React.FC = () => {
               <IonLabel>BMI: {bmiResult}</IonLabel>
             </IonCol>
             <IonCol size="12" className="ion-margin">
-              <IonLabel>Result : {bmiToText(bmiResult)}</IonLabel>
+              <IonLabel>BMI Range: {bmiToText(bmiResult).bmiRange}</IonLabel>
+            </IonCol>
+            <IonCol size="12" className="ion-margin">
+              <IonLabel>Result : {bmiToText(bmiResult).text}</IonLabel>
             </IonCol>
           </IonRow>
         </IonGrid>
@@ -130,4 +149,4 @@ const Tab1: React.FC = () => {
   );
 };
 
-export default Tab1;
+export default BMICalculator;
